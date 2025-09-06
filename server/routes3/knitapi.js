@@ -1078,14 +1078,14 @@ router.get('/machine-allocation-entry', (req, res, next) => {
         var orderNo = req.query.orderNo ? req.query.orderNo : '';
         var orgId = req.decoded.orgId;
 
-        Query = `SELECT * from knit_machine_allocation_line where orgId = ${orgId} and delStatus = 0 and Status = 1 `
+        Query = `SELECT * from knit_machine_allocation_head where orgId = ${orgId} and delStatus = 0 and Status = 1 `
 
         if (orderNo != '') {
             Query = Query + `and orderNo =  '${orderNo}' ; `
         }
 
 
-        // console.log(Query);
+        console.log(Query);
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1118,15 +1118,18 @@ router.get('/machine-allocation-entry-filter', (req, res, next) => {
         var knitFty = req.query.knitFty ?req.query.knitFty :'';
         var machineDia = req.query.machineDia ? req.query.machineDia : '' ;
 
-        Query = `SELECT id, headId, style, color, size, woId, greigeKg, machineDia, fsize_id, knitFty, knitFty_id, allocated, date_format(startDate, '%Y-%m-%d') as startDate , daysrequired, date_format(endDate, '%Y-%m-%d') as endDate, orgId, status, delStatus, createdBy, createdAt, modifiedBy, modifiedAt, seqId, oldId, buyer, orderNo from knit_machine_allocation_line
-                    where orgId = ${orgId} and delStatus = 0 and Status = 1 `
+        Query = `SELECT a.id, b.buyer, b.orderNo, a.headId, a.style, a.color, a.size, a.woId, a.greigeKg, a.machineDia, a.fsize_id, a.knitFty, a.knitFty_id, a.allocated, date_format(a.startDate, '%Y-%m-%d') as startDate, date_format(a.endDate, '%Y-%m-%d') as endDate, a.daysrequired  from knit_machine_allocation_line a 
+                left join knit_machine_allocation_head b on b.id = a.headId 
+                    where a.orgId = ${orgId} and a.delStatus = 0 and a.Status = 1 and b.orgId = ${orgId} and b.delStatus = 0 and b.Status = 1 `
 
+                    if (id != '' ) {
+                        Query = Query + `and a.headId = ${id} `
+                    }
                     if (knitFty != '' && machineDia != '') {
-                        Query = Query + `and knitFty = '${knitFty}' and machineDia = ${machineDia} ORDER BY seqId`
-                }
-
-        console.log(Query);
-        client.executeStoredProcedure('pquery_execution(?)', [Query], 
+                        Query = Query + `and a.knitFty = '${knitFty}' and a.machineDia = ${machineDia}`
+                    }
+        // console.log(Query);
+        client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
                     rows = result;
@@ -1156,18 +1159,20 @@ router.post('/machine-allocation-entry', async (req, res, next) => {
 
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        var id = req.params.id
+        var id = req.body.id ? req.body.id : 0;
+        var buyer = req.body.buyer;
+        var orderNo = req.body.orderNo;
+
 
         var data = [];
-        var headerQuery = "INSERT INTO tmp_knit_machine_allocation_line(line_id, buyer, orderNo, style, color, size, woId, greigeKg, machineDia, fsize_id, knitFty, knitFty_id, allocated, startDate, daysrequired, endDate, seqId , oldId ,createdBy, orgId) values "
+        var headerQuery = "INSERT INTO tmp_knit_machine_allocation_line(line_id, headId, style, color, size, woId, greigeKg, machineDia, fsize_id, knitFty, knitFty_id, allocated, startDate, daysrequired, endDate, createdBy, orgId) values "
 
         var data = req.body.data;
         var i = 0;
         for (let datalist of data) {
 
             var line_id = datalist.id ? datalist.id : 0;
-            var buyer = datalist.buyer ? datalist.buyer : '';
-            var orderNo = datalist.orderNo ? datalist.orderNo : '';
+            var headId = id;
             var style = datalist.style ? datalist.style : '';
             var color = datalist.color ? datalist.color : '';
             var size = datalist.size ? datalist.size : '';
@@ -1181,13 +1186,10 @@ router.post('/machine-allocation-entry', async (req, res, next) => {
             var startDate = datalist.startDate;
             var daysrequired = datalist.daysrequired;
             var endDate = datalist.endDate;
-            var seqId = datalist.seqId;
-            var oldId = datalist.oldId;
 
             bulkInsert =
                 `(${db.escape(line_id)},
-                ${db.escape(buyer)},
-                ${db.escape(orderNo)},
+                ${db.escape(headId)},
                 ${db.escape(style)},
                 ${db.escape(color)},
                 ${db.escape(size)},
@@ -1201,8 +1203,6 @@ router.post('/machine-allocation-entry', async (req, res, next) => {
                 ${db.escape(startDate)},
                 ${db.escape(daysrequired)},
                 ${db.escape(endDate)},
-                ${db.escape(seqId)},
-                ${db.escape(oldId)},
                 ${db.escape(loginId)},
                 ${db.escape(orgId)})`;
 
@@ -1214,9 +1214,9 @@ router.post('/machine-allocation-entry', async (req, res, next) => {
             i = i + 1;
         }
 
-        // console.log(headerQuery)
+        console.log(headerQuery)
 
-        client.executeNonQuery('ppost_knit_machine_allocation(?,?,?,?)', [id, headerQuery, loginId, orgId],
+        client.executeNonQuery('ppost_knit_machine_allocation(?,?,?,?,?,?)', [id, buyer, orderNo, headerQuery, loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -1264,90 +1264,6 @@ router.get('/productionDays', (req, res, next) => {
                     }
                 }
                 catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
-
-router.put('/machine-allocation-update', async (req, res, next) => {
-    try {
-
-        var loginId = req.decoded.loginId;
-        var orgId = req.decoded.orgId;
-        var id = req.body.id ? req.body.id : 0;
-        var data = [];
-
-
-        var headerQuery = "INSERT INTO tmp_machine_allocation(lineId, headId, seqId, style, color, size, woId, greigeKg, machineDia, knitFty, allocated, startDate, daysrequired, endDate, oldId, createdBy, orgId) values "
-
-        var data = req.body.data;
-        var i = 0;
-        for (let datalist of data) {
-
-            var lineid = datalist.id ? datalist.id : 0;
-            var headId = datalist.headId;
-            var style = datalist.style ? datalist.style : '';
-            var color = datalist.color ? datalist.color : '';
-            var size = datalist.size ? datalist.size : '';
-            var woId = datalist.woId;
-            var greigeKg = datalist.greigeKg;
-            var machineDia = datalist.machineDia;
-            var knitFty = datalist.knitFty;
-            var allocated = datalist.allocated;
-            var startDate = datalist.startDate;
-            var daysrequired = datalist.daysrequired;
-            var endDate = datalist.endDate;
-            var seqId = datalist.seqId;
-            var oldId = datalist.oldId;
-
-            bulkInsert =
-              `(${db.escape(lineid)},
-                ${db.escape(headId)},
-                ${db.escape(seqId)},
-                ${db.escape(style)},
-                ${db.escape(color)},
-                ${db.escape(size)},
-                ${db.escape(woId)},
-                ${db.escape(greigeKg)},
-                ${db.escape(machineDia)},
-                ${db.escape(knitFty)},
-                ${db.escape(allocated)},
-                ${db.escape(startDate)},
-                ${db.escape(daysrequired)},
-                ${db.escape(endDate)},
-                ${db.escape(oldId)},
-                ${db.escape(loginId)},
-                ${db.escape(orgId)})`;
-
-            if (i == (data.length - 1)) {
-                headerQuery = headerQuery + bulkInsert + ';'
-            } else {
-                headerQuery = headerQuery + bulkInsert + ','
-            }
-            i = i + 1;
-        }
-
-        console.log(headerQuery)
-
-        client.executeNonQuery('pput_machine_allocation(?,?,?,?)', [id, headerQuery, loginId, orgId],
-            req, res, next, function (result) {
-                try {
-                    rows = result;
-                    if (result.success == false) {
-                        res.json({ success: false, message: 'something went worng' });
-                    } else {
-                        if (id == 0) {
-                            res.json({ success: true, message: 'Updated successfully' });
-                        } else {
-                            res.json({ success: true, message: 'Updated successfully' });
-                        }
-
-                    }
-                } catch (err) {
                     next(err)
                 }
             });

@@ -413,7 +413,7 @@ router.post('/yarn', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        // console.log(headerQuery)
 
         client.executeNonQuery('ppost_yarn(?,?,?,?,?,?,?,?,?,?,?,?)', [id, spinner, lcDate, lcNo, pi, piDate, lcYarnTotal, lcValue, yarnStatus, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1053,83 +1053,46 @@ router.get('/LC-Outstanding', (req, res, next) => {
         var lcno = req.query.lcno? req.query.lcno : ''
         var status = req.query.status? req.query.status : ''
         var buyer = req.query.buyer? req.query.buyer : ''
-        Query = `select 
-	spinner, 
-	lcNo, 
-	lcDate, 
-	pi, 
-	piDate,
-	yarnType, 
-	lcYarnKgs, 
-	yarnRate, 
-	yarnValue, 
-	allocatedYarnKgs, 
-	ROUND(unallocatedYarnKgs,2) AS unallocatedYarnKgs, 
-	ROUND(receiptYarnKgs,2) AS receiptYarnKgs, 
-	ROUND(PendingallocatedKgs,2) AS PendingallocatedKgs, 
-	ROUND(PendingReceiptKgs,2) AS PendingReceiptKgs, 
-	ROUND(Receiptvalue,2) AS Receiptvalue, 
-	Status ,
-	ROUND((yarnValue - Receiptvalue ),2) as PendingLCValue 
-from (
-	select 
-		spinner, 
-		lcNo, 
-		lcDate, 
-		pi, 
-		piDate, 
-		yarnType, 
-		lcYarnKgs, 
-		yarnRate,
-		yarnValue,
-		allocatedYarnKgs,
-		unallocatedYarnKgs,
-		receiptYarnKgs ,
-		(lcYarnKgs - allocatedYarnKgs) as PendingallocatedKgs,
-		( lcYarnKgs - receiptYarnKgs ) as PendingReceiptKgs ,
-		(yarnRate * receiptYarnKgs ) as Receiptvalue , 
-		Status 
-	from (	SELECT 
-			y.spinner AS spinner,
-			y.lcNo AS lcNo,
-			DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
-			y.pi AS pi,
-			DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
-			yll.yarnType AS yarnType,
-			yll.lcYarnKgs AS lcYarnKgs,
-			yll.yarnRate AS yarnRate,
-			yll.yarnValue AS yarnValue,
-			ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
-			ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
-			ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
-			yarnStatus AS Status
-		FROM yarn y
-		LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
-		LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
-		LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
-		WHERE y.orgId = 1
-		  AND y.status = 1 
-		  AND y.delStatus = 0 
-		  AND yll.orgId = 1
-		  AND yll.status = 1 
-		  AND yll.delStatus = 0
-		  AND YRL.orgId = 1
-		  AND YRL.status = 1 
-		  AND YRL.delStatus = 0
-		GROUP BY
-			spinner,
-			lcNo,
-			lcDate,
-			pi,
-			piDate,
-			yarnType,
-			lcYarnKgs,
-			yarnRate,
-			yarnValue,
-			Status
-	) as Yarn  ) as Yarn `
+        Query = `SELECT * FROM (
+    SELECT 
+        Any_value(y.lcNo) AS lcNo,
+        Any_value(DATE_FORMAT(y.lcDate, "%Y-%m-%d")) AS lcDate,
+        Any_value(y.pi) AS pi,
+        Any_value(DATE_FORMAT(y.piDate, "%Y-%m-%d")) AS piDate,
+        Any_value(yll.yarnType) AS yarnType,
+        Any_value(yll.lcYarnKgs) AS lcYarnKgs,
+        Any_value(yll.yarnRate) AS yarnRate,
+        Any_value((
+            JSON_ARRAYAGG(JSON_OBJECT('Buyer', YOA.buyer))
+        )) AS buyers,
+        Any_value(yll.yarnValue) AS yarnValue,
+        ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
+        ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
+        ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
+        Any_value(yarnStatus) AS Status ,
+	   round(( Any_value(yll.lcYarnKgs) - ROUND(SUM(YOA.allocatedYarnKgs), 2)),2)	 as PendingallocatedKgs ,
+       round(( Any_value(yll.lcYarnKgs) - ROUND(SUM(YRL.receiptYarnKgs), 2)),2)  as PendingReceiptKgs ,
+       round(( Any_value(yll.yarnRate) * ROUND(SUM(YRL.receiptYarnKgs), 2)),2)  as Receiptvalue , 
+       round(( Any_value(yll.yarnValue) - ( (yll.yarnRate)*ROUND(SUM(YRL.receiptYarnKgs), 2) ) ),2)  as PendingLCValue
+    FROM yarn y
+    LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
+    LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
+    LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
+    WHERE y.orgId = ${orgId} 
+      AND y.status = 1 
+      AND y.delStatus = 0
+    GROUP BY 
+        y.lcNo,  
+        y.lcDate, 
+        y.pi,  
+        y.piDate, 
+        yll.yarnType, 
+        yll.lcYarnKgs, 
+        yll.yarnRate, 
+        yll.yarnValue
+) AS yarn `
 
-            if (lcno != '') {
+               if (lcno != '') {
                 Query += ` where lcNo = '${lcno}' `;
             }
     
@@ -1138,12 +1101,8 @@ from (
             }
 
             if (buyer != '') {
-                Query += ` where spinner = '${buyer}' `;
+                Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
             }
-
-            // if (buyer != '') {
-            //     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
-            // }
     
     
 
@@ -1180,91 +1139,44 @@ router.get('/LCOutstandingTotal', (req, res, next) => {
         var status = req.query.status? req.query.status : ''
         var buyer = req.query.buyer? req.query.buyer : ''
 
-        Query = `SELECT
-    ROUND(SUM(Receiptvalue),2) AS Receiptvalue,
-    ROUND(SUM(PendingLCValue),2) AS PendingLCValue,
-    ROUND(SUM(PendingReceiptKgs),2) AS PendingReceiptKgs,
-    ROUND(SUM(receiptYarnKgs),2) AS ReceiptKgs
-FROM (
-    SELECT
-        spinner,
-        lcNo,
-        lcDate,
-        pi,
-        piDate,
-        yarnType,
-        lcYarnKgs,
-        yarnRate,
-        yarnValue,
-        allocatedYarnKgs,
-        unallocatedYarnKgs,
-        receiptYarnKgs,
-        PendingallocatedKgs,
-        PendingReceiptKgs,
-        Receiptvalue,
-        Status,
-        (yarnValue - Receiptvalue) AS PendingLCValue
-    FROM (
-        SELECT
-            spinner,
-            lcNo,
-            lcDate,
-            pi,
-            piDate,
-            yarnType,
-            lcYarnKgs,
-            yarnRate,
-            yarnValue,
-            allocatedYarnKgs,
-            unallocatedYarnKgs,
-            receiptYarnKgs,
-            (lcYarnKgs - allocatedYarnKgs) AS PendingallocatedKgs,
-            (lcYarnKgs - receiptYarnKgs) AS PendingReceiptKgs,
-            (yarnRate * receiptYarnKgs) AS Receiptvalue,
-            Status
-        FROM (
-            SELECT 
-                y.spinner AS spinner,
-                y.lcNo AS lcNo,
-                DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
-                y.pi AS pi,
-                DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
-                yll.yarnType AS yarnType,
-                yll.lcYarnKgs AS lcYarnKgs,
-                yll.yarnRate AS yarnRate,
-                yll.yarnValue AS yarnValue,
-                ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
-                ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
-                ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
-                y.yarnStatus AS Status
-            FROM yarn y
-            LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
-            LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
-            LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
-            WHERE y.orgId = 1
-              AND y.status = 1 
-              AND y.delStatus = 0 
-              AND yll.orgId = 1
-              AND yll.status = 1 
-              AND yll.delStatus = 0
-              AND YRL.orgId = 1
-              AND YRL.status = 1 
-              AND YRL.delStatus = 0
-            GROUP BY
-                spinner,
-                lcNo,
-                lcDate,
-                pi,
-                piDate,
-                yarnType,
-                lcYarnKgs,
-                yarnRate,
-                yarnValue,
-                Status
-        ) AS Yarn1
-    ) AS Yarn2
-) AS Yarn3
- `
+        Query = `SELECT  Round(sum(Receiptvalue) , 2)  as Receiptvalue , Round(sum(PendingLCValue),2) as PendingLCValue FROM (
+    SELECT 
+        Any_value(y.lcNo) AS lcNo,
+        Any_value(DATE_FORMAT(y.lcDate, "%Y-%m-%d")) AS lcDate,
+        Any_value(y.pi) AS pi,
+        Any_value(DATE_FORMAT(y.piDate, "%Y-%m-%d")) AS piDate,
+        Any_value(yll.yarnType) AS yarnType,
+        Any_value(yll.lcYarnKgs) AS lcYarnKgs,
+        Any_value(yll.yarnRate) AS yarnRate,
+        Any_value((
+		JSON_ARRAYAGG(JSON_OBJECT('Buyer', YOA.buyer))
+        )) AS buyers,
+        Any_value(yll.yarnValue) AS yarnValue,
+        ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
+        ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
+        ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
+        Any_value(yarnStatus) AS Status ,
+		( Any_value(yll.lcYarnKgs) - ROUND(SUM(YOA.allocatedYarnKgs), 2)) as PendingallocatedKgs ,
+        ( Any_value(yll.lcYarnKgs) - ROUND(SUM(YRL.receiptYarnKgs), 2)) as PendingReceiptKgs ,
+        ( Any_value(yll.yarnRate) * ROUND(SUM(YRL.receiptYarnKgs), 2)) as Receiptvalue , 
+        ( Any_value(yll.yarnValue) - ( (yll.yarnRate)*ROUND(SUM(YRL.receiptYarnKgs), 2) ) ) as PendingLCValue
+    FROM yarn y
+    LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
+    LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
+    LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
+    WHERE y.orgId = ${orgId} 
+      AND y.status = 1 
+      AND y.delStatus = 0
+    GROUP BY 
+        y.lcNo,  
+        y.lcDate, 
+        y.pi,  
+        y.piDate, 
+        yll.yarnType, 
+        yll.lcYarnKgs, 
+        yll.yarnRate, 
+        yll.yarnValue
+) AS yarn2 `
 
 if (lcno != '') {
     Query += ` where lcNo = '${lcno}' `;
@@ -1275,12 +1187,8 @@ if (status != '') {
 }
 
 if (buyer != '') {
-    Query += ` where spinner = '${buyer}' `;
+    Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
 }
-
-// if (buyer != '') {
-//     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
-// }
     
 
         client.executeStoredProcedure('pquery_execution(?)', [Query],

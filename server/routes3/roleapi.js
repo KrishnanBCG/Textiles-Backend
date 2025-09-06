@@ -137,7 +137,7 @@ router.post('/roles', async (req, res, next) => {
                     if (result.affectedRows == 0) {
                         res.json({ success: false, message: 'exsists' });
                     } else {
-                        res.json({ success: true, message: 'added successfully' , data : profileQuery});
+                        res.json({ success: true, message: 'added successfully' });
                     }
                 }
                 catch (err) {

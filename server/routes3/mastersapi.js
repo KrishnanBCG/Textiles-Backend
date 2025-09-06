@@ -2607,6 +2607,7 @@ router.post('/machine-list', (req, res, next) => {
     }
 });
 
+
 // =============================== line Master =======================================================================================
 
 router.post('/line-list', (req, res, next) => {
@@ -2894,85 +2895,15 @@ router.get('/linemachinelist/:id', (req, res, next) => {
 
 // =============================== Working Day Master =======================================================================================
 
-router.get('/month_list', (req, res, next) => {
-    try {
-        var orgId = req.decoded.orgId;
-
-        Query = `SELECT * FROM month_master;`
-        
-        // if(machineDia != ''){
-        //     Query = Query + `and machineDia = ${machineDia} ;`
-        // }
-
-        // console.log(Query);
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, async function (result) {
-                try {
-                    rows = result;
-                    
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', data: [] });
-                    }
-                    else {
-                        res.send({
-                            success: true,
-                            month: rows.RowDataPacket[0],
-                        })
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
-
-
 router.post('/workingday_master', (req, res, next) => {
     try {
         var id = req.body.id ? req.body.id : 0;
-
+        var date = req.body.date?req.body.date:'';
+        var workhrs = req.body.workhrs?req.body.workhrs:'';
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        var month = req.body.month ? req.body.month : '';
 
-
-        var headerQuery = `INSERT INTO tmp_workingday (tempid,date, day, month, remarks, workhrs, orgId, createdBy) values `
-
-
-        var data = req.body.data;
-        var i = 0;
-        for (let datalist of data) {
-            var id = datalist.id ? datalist.id : 0;
-            var date = datalist.date?datalist.date:'';
-            var day = datalist.day?datalist.day:'';
-            var month = month ;
-            var remark = datalist.Remarks?datalist.Remarks:'';
-            var workhrs = datalist.workhrs?datalist.workhrs:0;
-            bulkInsert =
-
-            `(${db.escape(id)},
-            ${db.escape(date)},
-                ${db.escape(day)},
-                ${db.escape(month)},
-                ${db.escape(remark)},
-                ${db.escape(workhrs)},                
-                ${db.escape(orgId)},                                               
-                ${db.escape(loginId)})`;
-
-            if (i == (data.length - 1)) {
-                headerQuery = headerQuery + bulkInsert + ';'
-            } else {
-                headerQuery = headerQuery + bulkInsert + ','
-            }
-            i = i + 1;
-        }
-
-
-        client.executeNonQuery('ppost_workingday_master(?,?,?, ?)', [id,headerQuery , loginId, orgId],
+        client.executeNonQuery('ppost_workingday_master(?,?,?,?,?)', [id, date , workhrs , loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -3061,41 +2992,6 @@ router.get('/workingday_master_id/:id', (req, res, next) => {
         next(err)
     }
 });
-
-router.get('/workingday_month', (req, res, next) => {
-    try {
-        var orgId = req.decoded.orgId;
-        var id = req.params.id
-        var month = req.query.month?req.query.month:'';
-        var year = req.query.year?req.query.year:'';
-        Query = `select * from workingday where date_format(date , '%Y') = '${year}' and month ='${month}';`
-
-        console.log(Query);
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, async function (result) {
-                try {
-                    rows = result;
-                    
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', data: [] });
-                    }
-                    else {
-                        res.send({
-                            success: true,
-                            workingday: rows.RowDataPacket[0],
-                        })
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
-
 
 
 module.exports = router;

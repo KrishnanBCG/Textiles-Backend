@@ -100,11 +100,9 @@ router.get('/workorder/:id', (req, res, next) => {
 
 router.post('/workorder', async (req, res, next) => {
     try {
-        console.log(req.body)
+        // console.log(req.body)
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        var Buyer = req.body.Buyer
-        var OrderNo = req.body.OrderNo
         var data = [];
         var headerQuery = `INSERT INTO tmp_workorder (poid, polineId, buyer, orderNo, style, color, size, sizeid, fabType, fabricTypeId, fabDia, fabdiaId, fabGsm, fabrGSMId, greigeKg, finishKg, knitSL, spinFty, spinFtyId, knitFty, knitFtyId, dyeinFty, dyeinFtyId, yarnKg, orgId,createdBy, yarnType, yarnTypeId, orderPcs, orderFOBRate, knitRate, dyeRate, fSize, dyetype, dyeTypeId) values `
         var data = req.body.data;
@@ -114,8 +112,8 @@ router.post('/workorder', async (req, res, next) => {
             var id = datalist.id ? datalist.id : 0;
             var poid = datalist.poid;
             var polineId = datalist.polineId;
-            var buyer = Buyer;
-            var orderNo = OrderNo;
+            var buyer = datalist.Buyer;
+            var orderNo = datalist.OrderNo;
             var style = datalist.Style;
             var color = datalist.Color;
             var size = datalist.Size;
@@ -196,7 +194,7 @@ router.post('/workorder', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        // console.log(headerQuery)
 
         client.executeNonQuery('ppost_workorder(?,?,?,?)', [id, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -254,14 +252,14 @@ router.get('/workorders-filter', (req, res, next) => {
         var size = req.query.size ? req.query.size : '';
         var orgId = req.decoded.orgId;
 
-        Query = `select ANY_VALUE(id) AS id, buyer, orderNo, round(sum(yarnKg),2) as yarnKg, round(sum(greigeKg),2) as greigeKg, 
+        Query = `select id , buyer, orderNo, sum(fabDia) as fabDia , sum(fabGsm) as fabGsm ,fabType ,round(sum(yarnKg),2) as yarnKg, round(sum(greigeKg),2) as greigeKg, 
                     round(sum(finishKg), 2) as finishKg, sum(orderPcs) as orderPcs, 
                     round(sum(orderPcs * orderFOBRate),2) as orderValue, status
                     from workorder
                     where orgId = ${orgId} and status = 1 and delStatus = 0`
 
         if (id > 0) {
-            Query = Query + ` and id IN (${id}) group by buyer, orderNo, status;`
+            Query = Query + ` and id IN (${id}) group by id , buyer, orderNo, status , fabType ;`
         } else {
             if (buyer != '') {
                 Query = Query + ` and buyer IN ('${buyer}')`
@@ -281,7 +279,7 @@ router.get('/workorders-filter', (req, res, next) => {
         }
 
         Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        // console.log(Query);
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -451,7 +449,7 @@ router.get('/order_style_BO', (req, res, next) => {
         var orgId = req.decoded.orgId;
         var buyer = req.query.buyer ? req.query.buyer : '';
         var order = req.query.order ? req.query.order : '';
-        console.log(order)
+        // console.log(order)
 
         client.executeStoredProcedure('pget_order_style_BO(?,?,?)', [order, buyer, orgId],
             req, res, next, function (result) {
@@ -481,7 +479,7 @@ router.get('/style_Color_BO', (req, res, next) => {
         var buyer = req.query.buyer ? req.query.buyer : '';
         var order = req.query.order ? req.query.order : '';
         var style = req.query.style ? req.query.style : '';
-        console.log(order)
+        // console.log(order)
 
         client.executeStoredProcedure('pget_style_color_BO(?,?,?,?)', [style, order, buyer, orgId],
             req, res, next, function (result) {
@@ -541,8 +539,8 @@ router.get('/Fsize_Gsize_BO', (req, res, next) => {
         var style = req.query.style?req.query.style:'';
         var fsize = req.query.fsize?req.query.fsize:'';
 
-        console.log(style)
-        console.log(fsize)
+        // console.log(style)
+        // console.log(fsize)
 
         Query = `SELECT distinct size FROM fsize_master WHERE orgId = ${orgId} and style = '${style}' and concatSize = '${fsize}';`
 
@@ -862,10 +860,10 @@ router.get('/yarn_type_BO', (req, res, next) => {
 router.get('/RejTypeLoss_BO', (req, res, next) => {
     try {
         var orgId = req.decoded.orgId;
-        var color = req.query.color ? req.query.color : ''
+        var colorid = req.query.color ? req.query.color : ''
 
         Query = `select round(sum(losses),2) as losses from rej_type_master_line rtml left join rej_type_master rtm on rtm.id = rtml.rejTypeId 
-        WHERE rtml.colorId = ${color} and rtm.delStatus = 0 and rtm.status = 1;`
+        WHERE rtml.colorId = ${colorid} and rtm.delStatus = 0 and rtm.status = 1;`
 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, function (result) {
@@ -934,7 +932,7 @@ router.get('/ColorLoss_BO', (req, res, next) => {
         var color = req.query.color;
 
 
-        Query = `select sum(dye_process_loss)  as DyeProcessLoss from colors where id ='{color}';`
+        Query = `select sum(dye_process_loss)  as DyeProcessLoss from colors where id = '${color}' ;`
 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, function (result) {

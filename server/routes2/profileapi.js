@@ -14,10 +14,21 @@ router.get('/profile', (req, res, next) => {
             req, res, next, function (result) {
                 try {
                     rows = result;
-                    if (!rows) {
+                    if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', profiles: [] });
                     }
                     else {
+                        rows.RowDataPacket[0].forEach(data => {
+
+                            data.masters = JSON.parse(data.masters);
+                            data.workOrders = JSON.parse(data.workOrders);
+                            data.fabricRolls = JSON.parse(data.fabricRolls);
+                            data.garmentBundles = JSON.parse(data.garmentBundles);
+                            data.rollsEntry = JSON.parse(data.rollsEntry);
+                            data.bundlesEntry = JSON.parse(data.bundlesEntry);
+                            data.reports = JSON.parse(data.reports);
+                            data.dashboards = JSON.parse(data.dashboards);
+                        });
                         res.send({ success: true, profiles: rows.RowDataPacket[0] })
 
                     }

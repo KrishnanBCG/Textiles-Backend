@@ -158,7 +158,7 @@ router.get('/colors-sizes', (req, res, next) => {
                         res.json({ success: false, message: 'no records found!', sizes: [] });
                     }
                     else {
-                        res.send({ success: true, sizes: rows.RowDataPacket[1], gsize : rows.RowDataPacket[0] })
+                        res.send({ success: true, sizes: rows.RowDataPacket[0] })
                     }
                 }
                 catch (err) {
@@ -295,7 +295,7 @@ router.get('/colors-sizes_data', (req, res, next) => {
                         res.json({ success: false, message: 'no records found!', sizes: [] });
                     }
                     else {
-                        res.send({ success: true, sizes: rows.RowDataPacket[0] })
+                        res.send({ success: true, sizes: rows.RowDataPacket[0]  })
                     }
                 }
                 catch (err) {
@@ -307,6 +307,7 @@ router.get('/colors-sizes_data', (req, res, next) => {
         next(err)
     }
 });
+
 
 
 router.get('/machineDia', (req, res, next) => {
@@ -844,7 +845,6 @@ router.get('/knitentry_wosize', (req, res, next) => {
     }
 });
 
-
 //--------------------------------------cutting [Start]-------------------------------------------
 
 router.get('/cut_buyers', (req, res, next) => {
@@ -1045,6 +1045,7 @@ router.get('/cutting-filter', (req, res, next) => {
 });
 
 //--------------------------------------cutting [End]-------------------------------------------
+
 //--------------------------------------sewinput [Start]-------------------------------------------
 
 router.get('/sewinput_buyers', (req, res, next) => {
@@ -1446,6 +1447,7 @@ router.get('/sewoutput-filter', (req, res, next) => {
 });
 
 //--------------------------------------sewOutput [End]-------------------------------------------
+
 //--------------------------------------Sewing Packing  [Start]-------------------------------------------
 
 router.get('/packing_buyers', (req, res, next) => {
@@ -1852,31 +1854,5 @@ router.get('/shipping-filter', (req, res, next) => {
 //--------------------------------------Shipment  [End]-------------------------------------------
 
 
-router.get('/allmachineDia', (req, res, next) => {
-    try {
-        var orgId = req.decoded.orgId;
-
-        Query = `SELECT distinct machineDia from fsize_master where orgId = ${orgId} and delStatus = 0 and Status = 1;`
-
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, function (result) {
-                try {
-                    rows = result;
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', data: [] });
-                    }
-                    else {
-                        res.send({ success: true, data: rows.RowDataPacket[0] })
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
 
 module.exports = router;

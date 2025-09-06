@@ -9,10 +9,6 @@ app.set('superSecret', config.secret);
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { generateS3ViewLink } = require('../utils/service');
-const crypto = require('crypto');
-const algorithm = 'aes-256-cbc';
-const key = crypto.randomBytes(32); // store securely
-const iv = crypto.randomBytes(16);
 
 
 router.post('/authentication', function (req, res, next) {
@@ -194,44 +190,6 @@ router.get('/organization', (req, res, next) => {
                     }
                     else {
                         res.send({ success: true, org: rows.RowDataPacket[0] });
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
-function decrypt(text) {
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift(), 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-}
-router.get('/forgotPassword', (req, res, next) => {
-    try {
-        var email = req.query.email;
-        Query = `SELECT * FROM authentication where userName = ${email};`
-        // console.log(Query);
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, async function (result) {
-                try {
-                    rows = result;
-                    //console.log(rows.RowDataPacket);
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', workorder: [] });
-                    }
-                    else {
-                        res.send({
-                            success: true,
-                            password: rows.RowDataPacket[0].password,
-                        })
                     }
                 }
                 catch (err) {

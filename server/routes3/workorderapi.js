@@ -104,7 +104,7 @@ router.post('/workorder', async (req, res, next) => {
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
         var data = [];
-        var headerQuery = `INSERT INTO tmp_workorder (poid, polineId, buyer, orderNo, style, color, size, sizeid, fabType, fabricTypeId, fabDia, fabdiaId, fabGsm, fabrGSMId, greigeKg, finishKg, knitSL, spinFty, spinFtyId, knitFty, knitFtyId, dyeinFty, dyeinFtyId, yarnKg, orgId,createdBy, yarnType, yarnTypeId, orderPcs, orderFOBRate, knitRate, dyeRate, fSize, dyetype, dyeTypeId, status) values `
+        var headerQuery = `INSERT INTO tmp_workorder (poid, polineId, buyer, orderNo, style, color, size, sizeid, fabType, fabricTypeId, fabDia, fabdiaId, fabGsm, fabrGSMId, greigeKg, finishKg, knitSL, spinFty, spinFtyId, knitFty, knitFtyId, dyeinFty, dyeinFtyId, yarnKg, orgId,createdBy, yarnType, yarnTypeId, orderPcs, orderFOBRate, knitRate, dyeRate, fSize, dyetype, dyeTypeId) values `
         var data = req.body.data;
         var i = 0;
         for (let datalist of data) {
@@ -112,8 +112,8 @@ router.post('/workorder', async (req, res, next) => {
             var id = datalist.id ? datalist.id : 0;
             var poid = datalist.poid;
             var polineId = datalist.polineId;
-            var buyer = req.body.Buyer ?? datalist.Buyer;
-            var orderNo = req.body.OrderNo ?? datalist.OrderNo;
+            var buyer = datalist.Buyer;
+            var orderNo = datalist.OrderNo;
             var style = datalist.Style;
             var color = datalist.Color;
             var size = datalist.Size;
@@ -143,9 +143,8 @@ router.post('/workorder', async (req, res, next) => {
             var FSize = datalist.FSize;
             var dyetype = datalist.dyetype;
             var dyeTypeId = datalist.dyeTypeId;
-            var status = datalist.status;
 
-            debugger
+
             bulkInsert =
             `(${db.escape(poid)},
                 ${db.escape(polineId)},
@@ -181,8 +180,7 @@ router.post('/workorder', async (req, res, next) => {
                 ${db.escape(DyeRate)},
                 ${db.escape(FSize)},
                 ${db.escape(dyetype)},
-                ${db.escape(dyeTypeId)},   
-                ${db.escape(status)}           
+                ${db.escape(dyeTypeId)}           
                 )`;
 
 
@@ -196,7 +194,7 @@ router.post('/workorder', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log( headerQuery)
+        console.log(headerQuery)
 
         client.executeNonQuery('ppost_workorder(?,?,?,?)', [id, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1108,174 +1106,6 @@ router.post('/fab-booking', (req, res, next) => {
         next(err)
     }
 });
-
-
-router.get('/Combined_Fsize_FabDetails_Gsize_PODetailsLoss_Size_id_BO', (req, res, next) => {
-    try {
-        var orgId = req.decoded.orgId;
-        var style = req.query.style || '';
-        var fsize = req.query.fsize || '';
-        var buyer = req.query.buyer || '';
-        var order = req.query.order || '';
-        var color = req.query.color || '';
-        var size = req.query.size || '';
-
-        // Query for Gsize (from fsize_master)
-        let queryFsize = `
-            SELECT DISTINCT size 
-            FROM fsize_master 
-            WHERE orgId = ${orgId} 
-            AND style = '${style}' 
-            AND concatSize = '${fsize}';
-        `;
-
-        // Query for PODetailsLoss
-        let queryPODetailsLoss = `
-            SELECT pml.popl AS popl 
-            FROM po_master pm 
-            JOIN po_master_line pml ON pm.id = pml.orderId
-            WHERE pm.buyer = '${buyer}'
-            AND pm.orderNo = '${order}'
-            AND pml.style = '${style}'
-            AND pml.color = '${color}'
-            AND pml.size = '${size}';
-        `;
-
-        // Execute queries step-by-step
-        client.executeStoredProcedure('pquery_execution(?)', [queryFsize], req, res, next, function (result1) {
-            try {
-                let gsizeRows = result1?.RowDataPacket ? result1.RowDataPacket[0] : [];
-
-                client.executeStoredProcedure('pquery_execution(?)', [queryPODetailsLoss], req, res, next, function (result2) {
-                    try {
-                        let poDetailsRows = result2?.RowDataPacket ? result2.RowDataPacket[0] : [];
-
-                        client.executeStoredProcedure('pget_size_id_BO(?,?,?,?,?,?)', [size, color, style, order, buyer, orgId], req, res, next, function (result3) {
-                            try {
-                                let sizeIdRows = result3?.RowDataPacket ? result3.RowDataPacket[0] : [];
-
-                                client.executeStoredProcedure('pget_fsize_BO(?,?,?)', [size, style, orgId], req, res, next, function (result4) {
-                                    try {
-                                        if (!result4.RowDataPacket) {
-                                            res.json({
-                                                success: false,
-                                                message: 'no records found!',
-                                                buyers: []
-                                            });
-                                        } else {
-                                            res.send({
-                                                success: true,
-                                                Gsize: gsizeRows,
-                                                Colorlosses: poDetailsRows,
-                                                sizeId: sizeIdRows,
-                                                fsize: result4.RowDataPacket[0],
-                                                FabDia: result4.RowDataPacket[1],
-                                                FabGsm: result4.RowDataPacket[2],
-                                                finishfabConsumption: result4.RowDataPacket[3]
-                                            });
-                                        }
-                                    } catch (err) {
-                                        next(err);
-                                    }
-                                });
-                            } catch (err) {
-                                next(err);
-                            }
-                        });
-                    } catch (err) {
-                        next(err);
-                    }
-                });
-            } catch (err) {
-                next(err);
-            }
-        });
-
-    } catch (err) {
-        next(err);
-    }
-});
-
-router.get('/Combined_RejTypeLoss_ColorLoss_DyeTypeMaster_fabricType_Details_BO', (req, res, next) => {
-    try {
-        var orgId = req.decoded.orgId;
-        var colorid = req.query.colorid || req.query.color || '';
-        var StyleId = req.query.StyleId || '';
-        var dyeTypeId = req.query.dyeTypeId || '';
-        var fabTypeId = req.query.fabTypeId || '';
-
-        let queryRejTypeLoss = `
-            SELECT ROUND(SUM(losses), 2) AS losses
-            FROM rej_type_master_line rtml 
-            LEFT JOIN rej_type_master rtm ON rtm.id = rtml.rejTypeId 
-            WHERE rtml.colorId = ${colorid} 
-              AND rtm.delStatus = 0 
-              AND rtm.status = 1;
-        `;
-
-        let queryColorLoss = `
-            SELECT SUM(dye_process_loss) AS DyeProcessLoss
-            FROM colors
-            WHERE id = '${colorid}';
-        `;
-
-        let queryDyeTypeLoss = `
-            SELECT SUM(dtm.dyepl) AS dyepl
-            FROM styles s 
-            JOIN dye_type_master dtm ON s.dyeTypeId = dtm.id 
-            WHERE s.id = ${StyleId} 
-              AND dtm.id = ${dyeTypeId};
-        `;
-
-        let queryFabricTypeLoss = `
-            SELECT SUM(ftm.dyepl) AS fabpl
-            FROM styles s 
-            JOIN fabric_type_masters ftm ON s.fabricTypeId = ftm.id 
-            WHERE s.id = ${StyleId} 
-              AND ftm.id = ${fabTypeId};
-        `;
-
-        // Run queries in sequence (can be optimized to parallel if needed)
-        client.executeStoredProcedure('pquery_execution(?)', [queryRejTypeLoss], req, res, next, function (result1) {
-            try {
-                let rejTypeLoss = result1 && result1.RowDataPacket ? result1.RowDataPacket[0] : [];
-
-                client.executeStoredProcedure('pquery_execution(?)', [queryColorLoss], req, res, next, function (result2) {
-                    try {
-                        let colorLoss = result2 && result2.RowDataPacket ? result2.RowDataPacket[0] : [];
-
-                        client.executeStoredProcedure('pquery_execution(?)', [queryDyeTypeLoss], req, res, next, function (result3) {
-                            try {
-                                let dyeTypeLoss = result3 && result3.RowDataPacket ? result3.RowDataPacket[0] : [];
-
-                                client.executeStoredProcedure('pquery_execution(?)', [queryFabricTypeLoss], req, res, next, function (result4) {
-                                    try {
-                                        let fabricTypeLoss = result4 && result4.RowDataPacket ? result4.RowDataPacket[0] : [];
-
-                                        res.send({
-                                            success: true,
-                                            RejTypeLoss: rejTypeLoss,
-                                            DyeProcessLoss: colorLoss,
-                                            DyeTypeLoss: dyeTypeLoss,
-                                            FabricTypeLoss: fabricTypeLoss
-                                        });
-                                    } catch (err) { next(err); }
-                                });
-
-                            } catch (err) { next(err); }
-                        });
-
-                    } catch (err) { next(err); }
-                });
-
-            } catch (err) { next(err); }
-        });
-
-    } catch (err) {
-        next(err);
-    }
-});
-
 
 
 module.exports = router;

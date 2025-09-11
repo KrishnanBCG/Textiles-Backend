@@ -452,7 +452,7 @@ router.post('/knit-delivery', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_knit_delivery(?,?,?,?,?,?)', [id, factory, date, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -546,7 +546,7 @@ router.get('/knit-delivery-filter', (req, res, next) => {
             Query = Query + ` and ktl.size IN ('${size}')`
         }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {

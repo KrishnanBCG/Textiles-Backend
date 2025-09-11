@@ -225,7 +225,7 @@ router.post('/cutting', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_cutting(?,?,?)', [headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -476,7 +476,7 @@ router.post('/sewing-input', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_sewing_input(?,?,?)', [headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -743,7 +743,7 @@ router.post('/sewing-output', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_sewing_output(?,?,?)', [headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1021,7 +1021,7 @@ router.post('/sewing-packing', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_sewing_packing(?,?,?)', [headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1245,7 +1245,7 @@ router.post('/sewing-shipping', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_sewing_shipping(?,?,?,?,?,?,?,?)', [id, buyer, orderNo, shipDate, notes, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1474,7 +1474,7 @@ router.post('/sewing-invoice', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_sewing_invoice(?,?,?,?,?,?,?,?)', [id, buyer, invoice, invoiceDate, notes, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1661,7 +1661,7 @@ router.post('/line_allocation', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_line_allocation(?,?, ?,?)', [id, headerQuery, loginId, orgId],
             req, res, next, function (result) {

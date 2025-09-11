@@ -128,7 +128,7 @@ router.post('/roles', async (req, res, next) => {
             profileQuery = await generateQuery(id, profiles, profileQuery);
         }
 
-        console.log(id, name, profileQuery, loginId, orgId);
+        // console.log(id, name, profileQuery, loginId, orgId);
         client.executeNonQuery('ppost_roles(?,?,?,?,?)', [id, name, profileQuery, loginId, orgId],
             req, res, next, function (result) {
                 try {

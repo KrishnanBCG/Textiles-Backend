@@ -204,7 +204,7 @@ router.post('/knit', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_knit(?,?,?,?,?,?,?,?,?,?,?,?)', [id, factory, date, allocatedDay, houseKeepingStatus, floorLightingStatus, gasElecAvailability, storageAreaStatus, status , headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -316,7 +316,7 @@ router.get('/knit-filter', (req, res, next) => {
                 Query = Query + ` where  JSON_CONTAINS(colors, JSON_OBJECT('color','${color}'));`
             }
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -401,7 +401,7 @@ router.get('/knit_Total_filter', (req, res, next) => {
                 Query = Query + ` where  JSON_CONTAINS(colors, JSON_OBJECT('color','${color}'));`
             }
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -440,7 +440,7 @@ router.get('/knit_color_list', (req, res, next) => {
 
         Query = `SELECT DISTINCT color FROM knit_line where orgId = 1 AND status = 1  AND delStatus = 0 `
     
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -502,7 +502,7 @@ if (size != '') {
 }
     
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -564,7 +564,7 @@ if (size != '') {
 }
     
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -602,7 +602,7 @@ router.get('/order-filter', (req, res, next) => {
         INNER JOIN 
             knit_line ktl ON kt.id = ktl.knitId ;`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -750,7 +750,7 @@ router.post('/knitworkorder', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_knitWorkOrder(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [id, knitfty, knitfty_details, buyer, orderNo, woNo, woRefNo, woDate, completedDate, knitKgs, knitValue, notes, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -1013,7 +1013,7 @@ JOIN
         Query += ` GROUP BY kl.buyer, kl.orderNo, kl.style, kl.color, kl.size ;`;
 
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1085,7 +1085,7 @@ router.get('/machine-allocation-entry', (req, res, next) => {
         }
 
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1125,7 +1125,7 @@ router.get('/machine-allocation-entry-filter', (req, res, next) => {
                         Query = Query + `and knitFty = '${knitFty}' and machineDia = ${machineDia} ORDER BY seqId`
                 }
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query], 
             req, res, next, async function (result) {
                 try {
@@ -1331,7 +1331,7 @@ router.put('/machine-allocation-update', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('pput_machine_allocation(?,?,?,?)', [id, headerQuery, loginId, orgId],
             req, res, next, function (result) {

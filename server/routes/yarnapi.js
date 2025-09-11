@@ -413,7 +413,7 @@ router.post('/yarn', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_yarn(?,?,?,?,?,?,?,?,?,?,?,?)', [id, spinner, lcDate, lcNo, pi, piDate, lcYarnTotal, lcValue, yarnStatus, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -470,7 +470,7 @@ router.post('/yarn_lot_check', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_yarn_lot_check(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -529,7 +529,7 @@ router.post('/yarn_order_allocations', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_yarn_order_allocations(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -587,7 +587,7 @@ router.post('/yarn_receipts_lines', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_yarn_receipts_lines(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -642,7 +642,7 @@ router.post('/yarn_quality_check', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_yarn_quality_check(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -744,7 +744,7 @@ router.get('/yarn-filter', (req, res, next) => {
         // if (size != '') {
         //     Query = Query + ` and ktl.size IN ('${size}')`
         // }
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1151,7 +1151,7 @@ from (
             req, res, next, async function (result) {
                 try {
                     rows = result;
-                    console.log(rows.RowDataPacket);
+                    
                     if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', workorder: [] });
                     }
@@ -1287,7 +1287,7 @@ if (buyer != '') {
             req, res, next, async function (result) {
                 try {
                     rows = result;
-                    console.log(rows.RowDataPacket);
+                    
                     if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', LCOutstandingTotal: [] });
                     }
@@ -1316,14 +1316,14 @@ router.get('/Buyer-List', (req, res, next) => {
         Query = `select distinct buyer from yarn_order_allocations  	
         where orgId = ${orgId} and status = 1 and delStatus = 0`
 
-        // console.log(Query);     
-        // console.log(Query);
+        //      
+        // 
         
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
                     rows = result;
-                    console.log(rows.RowDataPacket);
+                    
                     if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', buyer: [] });
                     }
@@ -1352,14 +1352,14 @@ router.get('/lcNo-List', (req, res, next) => {
         Query = `select distinct lcNo from yarn  	
         where orgId = ${orgId} and status = 1 and delStatus = 0`
 
-        // console.log(Query);     
-        // console.log(Query);
+        //      
+        // 
         
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
                     rows = result;
-                    console.log(rows.RowDataPacket);
+                    
                     if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', lcNo: [] });
                     }
@@ -1387,14 +1387,14 @@ router.get('/Status-List', (req, res, next) => {
         Query = `select distinct yarnStatus from yarn  	
         where orgId = ${orgId} and status = 1 and delStatus = 0`
 
-        // console.log(Query);     
-        // console.log(Query);
+        //      
+        // 
         
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
                     rows = result;
-                    console.log(rows.RowDataPacket);
+                    
                     if (!rows.RowDataPacket) {
                         res.json({ success: false, message: 'no records found!', yarnStatus: [] });
                     }

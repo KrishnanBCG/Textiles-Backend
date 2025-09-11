@@ -2129,7 +2129,7 @@ router.post('/rejType-master', (req, res, next) => {
                 i = i + 1;
             }
     
-            console.log(headerQuery)
+            
     
             client.executeNonQuery('ppost_rejType_master(?,?,?,?,?,?,?)', [id, rejType, rejName, losses, headerQuery, loginId, orgId],
                 req, res, next, function (result) {
@@ -2390,7 +2390,7 @@ router.post('/po-master_line', (req, res, next) => {
                 i = i + 1;
             }
     
-            console.log(headerQuery)
+            
     
             client.executeNonQuery('ppost_po_master_line(?,?,?,?)', [id, headerQuery, loginId, orgId],
                 req, res, next, function (result) {
@@ -2514,7 +2514,7 @@ router.get('/machine-list', (req, res, next) => {
             Query = Query + `and machineDia = ${machineDia} ;`
         }
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2547,7 +2547,7 @@ router.get('/machine-list/:id', (req, res, next) => {
 
         Query = `SELECT * from knit_machine_list where orgId = ${orgId} and delStatus = 0 and id = ${id};`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2647,7 +2647,7 @@ router.get('/line-list', (req, res, next) => {
         //     Query = Query + `and machineDia = ${machineDia} ;`
         // }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2682,7 +2682,7 @@ router.get('/line/:id', (req, res, next) => {
 
         Query = `SELECT * from line where orgId = ${orgId} and delStatus = 0 and id = ${id};`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2744,7 +2744,7 @@ router.post('/linemachinelist-master', (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        
 
         client.executeNonQuery('ppost_linemachinelist_master(?,?,?,?,?,?,?)', 
             [id, style, styleid,    prodhr, headerQuery, loginId, orgId],
@@ -2782,7 +2782,7 @@ router.get('/lineName-list', (req, res, next) => {
         //     Query = Query + `and machineDia = ${machineDia} ;`
         // }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2825,7 +2825,7 @@ router.get('/linemachinelist-list', (req, res, next) => {
         //     Query = Query + `and machineDia = ${machineDia} ;`
         // }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2865,7 +2865,7 @@ router.get('/linemachinelist/:id', (req, res, next) => {
         WHERE  lm.delStatus = 0 
         AND lm.orgId = ${orgId} and lm.id = ${id};`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -2904,7 +2904,7 @@ router.get('/month_list', (req, res, next) => {
         //     Query = Query + `and machineDia = ${machineDia} ;`
         // }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -3002,7 +3002,7 @@ router.get('/workingday_master_list', (req, res, next) => {
         //     Query = Query + `and machineDia = ${machineDia} ;`
         // }
 
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -3036,7 +3036,7 @@ router.get('/workingday_master_id/:id', (req, res, next) => {
 
         Query = `SELECT * from workingday where orgId = ${orgId} and delStatus = 0 and id = ${id};`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -3070,7 +3070,7 @@ router.get('/workingday_month', (req, res, next) => {
         var year = req.query.year?req.query.year:'';
         Query = `select * from workingday where date_format(date , '%Y') = '${year}' and month ='${month}';`
 
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {

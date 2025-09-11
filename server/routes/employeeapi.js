@@ -171,7 +171,7 @@ router.get('fabricentrys', (req, res, next) => {
     try {
         var workorder = req.query.workorder;
         var entry = req.query.entry;
-        console.log(req.query);
+        //console.log(req.query);
         var orgId = req.decoded.orgId;
         client.executeStoredProcedure('pview_fabricroll(?,?)', [id, orgId],
             req, res, next, async function (result) {

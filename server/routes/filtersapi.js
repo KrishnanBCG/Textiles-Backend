@@ -1018,7 +1018,7 @@ router.get('/cutting-filter', (req, res, next) => {
         
 
         // Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1218,7 +1218,7 @@ router.get('/sewinput-filter', (req, res, next) => {
         
 
         // Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1419,7 +1419,7 @@ router.get('/sewoutput-filter', (req, res, next) => {
         
 
         // Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1619,7 +1619,7 @@ router.get('/packing-filter', (req, res, next) => {
         
 
         // Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -1823,7 +1823,7 @@ router.get('/shipping-filter', (req, res, next) => {
         
 
         // Query = Query + ` group by buyer, orderNo, status;`
-        console.log(Query);
+        
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {

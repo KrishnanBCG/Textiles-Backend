@@ -20,7 +20,7 @@ router.post('/authentication', function (req, res, next) {
     var userName = req.body.userName;
     var password = req.body.password;
     var hashedPassword = hash.generate(password);
-    console.log(hashedPassword);
+    //console.log(hashedPassword);
     client.executeStoredProcedure('pauthenticateUser(?)', [userName], req, res, next, async function (result) {
         if (!result.RowDataPacket) {
             res.json({ success: false, error: 'username not exsists', data: [] });
@@ -135,7 +135,7 @@ router.post('/reset_password', function (req, res, next) {
     var confrimPassword = req.body.confrimPassword;
     // var newPassword = req.body.newPassword;
     var hashedPassword = hash.generate(confrimPassword);
-    console.log(hashedPassword);
+    //console.log(hashedPassword);
     client.executeNonQuery('ppost_reset_password(?,?)', [userName, hashedPassword],
         req, res, next, function (result) {
             try {
@@ -218,7 +218,7 @@ router.get('/forgotPassword', (req, res, next) => {
     try {
         var email = req.query.email;
         Query = `SELECT * FROM authentication where userName = ${email};`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {

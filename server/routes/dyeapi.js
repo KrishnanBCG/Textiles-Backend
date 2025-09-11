@@ -281,7 +281,7 @@ router.post('/dye', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+       // console.log(headerQuery)
 
         client.executeNonQuery('ppost_dye(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [id, dyeFactory,buyer,orderNo,style,color,fabricType,softner,silicon,enzyme,batchNo,batchRemarks,batch_batchMakeDate,batch_batchRollsSLCheck,dyeing_loadDatetime,dyeing_unloadingDateTime,dyeing_totalRunTime,dyeing_receipeChart,shade_lapDipOriginalQTX,shade_masterBatchCheck,shade_dyeUnloadShadeCheck,shade_shadeSubmissionDate,shade_shadeApprovalDate,shade_firstBatchNotOkReason,squeezer_squeezerDateTime,squeezer_rpmValue,squeezer_trolleyPlate,squeezer_overfeedValue,squeezer_padderPressureValue,squeezer_shape,squeezer_backAngle,dryer_dryerDatetime,dryer_temperatureValue,dryer_rpmValue,dryer_overfeedValue,calendar_rpmValue,calendar_steamHighLow,slitting_slittingDatetime,slitting_DTwister,slitting_trolleyPlate,stenter_stenterDatetime,stenter_temperatureValue,stenter_overfeedValue,stenter_diasettingValue,stenter_softnerSiliconUsage,compact_openCompactDatetime,compact_rpmValue,compact_overfeedValue,compact_diasettingValue,compact_steamHighLow,tubtex_tubtexDatetime,tubtex_yarnLot,tubtex_overfeedValue,tubtex_steamHighLow,tubtex_rollerKnifeSetting,tubtex_sideLoosePileCheck,tubtex_diaGSMCheck,tubtex_shadeLightBoxDataColor,finalbatch_shrinkageTwistingReport,finalbatch_GSMReport,finalbatch_rollRollShadeCheck,finalbatch_rubbingReportWetDry,finalbatch_phReportInhouseCheck,finalbatch_phenolicYellowingTest,finalbatch_qcInspectionReport,finalbatch_batchRollsWeight,finalbatch_finishRollsWeight,finalbatch_processLoss,finalbatch_fabricDeliveryDatetime,headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -341,7 +341,7 @@ router.get('/DyeFactoryFilter', (req, res, next) => {
     try {
         var orgId = req.decoded.orgId;
         Query = `SELECT DISTINCT D.dyeFactory FROM dye D WHERE orgId = ${orgId} AND status = 1 AND delStatus = 0;`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -373,7 +373,7 @@ router.get('/DyeBuyerFilter', (req, res, next) => {
         var dyeFactory = req.query.dyeFactory ? req.query.dyeFactory : '';
         var orgId = req.decoded.orgId;
         Query = `select DISTINCT D.buyer from dye D where D.dyeFactory = '${dyeFactory}' and orgId = '${orgId}' and status = 1 and delStatus = 0`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -406,7 +406,7 @@ router.get('/DyeOrderNoFilter', (req, res, next) => {
         var Buyer = req.query.buyer ? req.query.buyer : '';
         var orgId = req.decoded.orgId;
         Query = `select DISTINCT D.orderNo from dye D where dyeFactory = '${dyeFactory}' and buyer = '${Buyer}' and orgId = ${orgId} and status = 1 and delStatus = 0;`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -440,7 +440,7 @@ router.get('/DyeStyleFilter', (req, res, next) => {
         var Order = req.query.orderNo ? req.query.orderNo : '';
         var orgId = req.decoded.orgId;
         Query = `select DISTINCT D.style from dye D where dyeFactory = '${dyeFactory}' and buyer = '${Buyer}' and orderNo = '${Order}' and orgId = ${orgId} and status = 1 and delStatus = 0;`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -475,7 +475,7 @@ router.get('/DyeColorFilter', (req, res, next) => {
         var style = req.query.style ? req.query.style : '';
         var orgId = req.decoded.orgId;
         Query = `select DISTINCT D.color from dye D where dyeFactory = '${dyeFactory}' and buyer = '${Buyer}' and orderNo = '${Order}' and style = '${style}' and orgId = ${orgId} and status = 1 and delStatus = 0;`
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -509,7 +509,7 @@ router.get('/DyecodeFilter', (req, res, next) => {
         var style = req.query.style ? req.query.style : '';
         var color = req.query.color ? req.query.color : '';
         var orgId = req.decoded.orgId;
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pget_dyebatchcode(?,?,?,?,?,?)', [Buyer,Order,style,color,orgId,dyeFactory],
             req, res, next, async function (result) {
                 try {
@@ -587,7 +587,7 @@ router.get('/dye-filter', (req, res, next) => {
         // if (size != '') {
         //     Query = Query + ` and ktl.size IN ('${size}')`
         // }
-        // console.log(Query);
+        // 
         client.executeStoredProcedure('pquery_execution(?)', [Query],
             req, res, next, async function (result) {
                 try {
@@ -762,7 +762,7 @@ router.post('/dyeworkorder', async (req, res, next) => {
             i = i + 1;
         }
 
-        console.log(headerQuery)
+        //console.log(headerQuery)
 
         client.executeNonQuery('ppost_dyeWorkOrder(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [id, dyefty, dyefty_details, buyer, orderNo, woNo, woRefNo, woDate, completedDate, dyeKgs, dyeValue, notes, headerQuery, loginId, orgId],
             req, res, next, function (result) {

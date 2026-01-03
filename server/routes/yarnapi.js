@@ -67,7 +67,7 @@ router.get('/yarn-lcNo', (req, res, next) => {
         var orgId = req.decoded.orgId;
         var spinner = req.query.spinner;
 
-        client.executeStoredProcedure('pgetall_yarnlcNo(?,?)', [spinner,orgId],
+        client.executeStoredProcedure('pgetall_yarnlcNo(?,?)', [spinner, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -143,7 +143,7 @@ router.get('/yarn-some-status', (req, res, next) => {
         var spinner = req.query.spinner;
         var lcNo = req.query.lcNo;
 
-        client.executeStoredProcedure('pget_yarnStatus(?,?,?)', [spinner,lcNo,orgId],
+        client.executeStoredProcedure('pget_yarnStatus(?,?,?)', [spinner, lcNo, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -236,13 +236,13 @@ router.get('/yarn/:id', (req, res, next) => {
                         const yarn_lotNo = rows.RowDataPacket[7]
                         res.send({
                             success: true,
-                            yarn :  yarn,
-                            yarn_lc_lines :  yarn_lc_lines,
-                            yarn_lc_total : yarn_total,
-                            yarn_lot_check :  yarn_lot_check,
-                            yarn_order_allocations :  yarn_order_allocations,
-                            yarn_receipts_lines :  yarn_receipts_lines,
-                            yarn_quality_check :  yarn_quality_check,
+                            yarn: yarn,
+                            yarn_lc_lines: yarn_lc_lines,
+                            yarn_lc_total: yarn_total,
+                            yarn_lot_check: yarn_lot_check,
+                            yarn_order_allocations: yarn_order_allocations,
+                            yarn_receipts_lines: yarn_receipts_lines,
+                            yarn_quality_check: yarn_quality_check,
                             lotNo: yarn_lotNo
                         })
                     }
@@ -255,7 +255,7 @@ router.get('/yarn/:id', (req, res, next) => {
     catch (err) {
         next(err)
     }
-}); 
+});
 
 router.get('/yarnReceiptForQC', (req, res, next) => {
     try {
@@ -263,7 +263,7 @@ router.get('/yarnReceiptForQC', (req, res, next) => {
         var id = req.query.id;
         var receiptId = req.query.receiptId
 
-        client.executeStoredProcedure('pget_yarnReceiptForQC(?,?,?)', [id,receiptId,orgId],
+        client.executeStoredProcedure('pget_yarnReceiptForQC(?,?,?)', [id, receiptId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -271,9 +271,11 @@ router.get('/yarnReceiptForQC', (req, res, next) => {
                         res.json({ success: false, message: 'no records found!', receipt: [] });
                     }
                     else {
-                        res.send({ success: true, 
+                        res.send({
+                            success: true,
                             receipt: rows.RowDataPacket[0],
-                            yarnQc : rows.RowDataPacket[1] })
+                            yarnQc: rows.RowDataPacket[1]
+                        })
                     }
                 }
                 catch (err) {
@@ -293,7 +295,7 @@ router.get('/yarnlclineForLot', (req, res, next) => {
         var id = req.query.id;
         var lineId = req.query.lineId
 
-        client.executeStoredProcedure('pget_yarnLineforLot(?,?,?)', [id,lineId,orgId],
+        client.executeStoredProcedure('pget_yarnLineforLot(?,?,?)', [id, lineId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -320,7 +322,7 @@ router.get('/yarnlclineForOrder', (req, res, next) => {
         var id = req.query.id;
         var lineId = req.query.lineId
 
-        client.executeStoredProcedure('pget_yarnLineforOrder(?,?,?)', [id,lineId,orgId],
+        client.executeStoredProcedure('pget_yarnLineforOrder(?,?,?)', [id, lineId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -347,7 +349,7 @@ router.get('/yarnlclineForReceipt', (req, res, next) => {
         var id = req.query.id;
         var lineId = req.query.lineId
 
-        client.executeStoredProcedure('pget_yarnLineforReceipt(?,?,?)', [id,lineId,orgId],
+        client.executeStoredProcedure('pget_yarnLineforReceipt(?,?,?)', [id, lineId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -413,7 +415,7 @@ router.post('/yarn', async (req, res, next) => {
             i = i + 1;
         }
 
-        
+
 
         client.executeNonQuery('ppost_yarn(?,?,?,?,?,?,?,?,?,?,?,?)', [id, spinner, lcDate, lcNo, pi, piDate, lcYarnTotal, lcValue, yarnStatus, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -470,7 +472,7 @@ router.post('/yarn_lot_check', async (req, res, next) => {
             i = i + 1;
         }
 
-        
+
 
         client.executeNonQuery('ppost_yarn_lot_check(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -511,9 +513,9 @@ router.post('/yarn_order_allocations', async (req, res, next) => {
             var line_id = datalist.id ? datalist.id : 0;
             var yarnLineId = datalist.yarnLineId ? datalist.yarnLineId : 0;
             var yarnType = datalist.yarnType ? datalist.yarnType : '';
-            var buyer = datalist.buyer ? datalist.buyer: '';
+            var buyer = datalist.buyer ? datalist.buyer : '';
             var utilisationOrderNo = datalist.utilisationOrderNo ? datalist.utilisationOrderNo : '';
-            var style = datalist.style? datalist.style : '';
+            var style = datalist.style ? datalist.style : '';
             var colour = datalist.colour ? datalist.colour : '';
             var lotNo = datalist.lotNo ? datalist.lotNo : '';
             var allocatedYarnKgs = datalist.allocatedYarnKgs ? datalist.allocatedYarnKgs : '';
@@ -529,7 +531,7 @@ router.post('/yarn_order_allocations', async (req, res, next) => {
             i = i + 1;
         }
 
-        
+
 
         client.executeNonQuery('ppost_yarn_order_allocations(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -587,7 +589,7 @@ router.post('/yarn_receipts_lines', async (req, res, next) => {
             i = i + 1;
         }
 
-        
+
 
         client.executeNonQuery('ppost_yarn_receipts_lines(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -642,7 +644,7 @@ router.post('/yarn_quality_check', async (req, res, next) => {
             i = i + 1;
         }
 
-        
+
 
         client.executeNonQuery('ppost_yarn_quality_check(?,?,?,?)', [yarnId, headerQuery, loginId, orgId],
             req, res, next, function (result) {
@@ -936,7 +938,7 @@ router.delete('/lotCheckDelete', (req, res, next) => {
         var lotCheckid = req.query.lotCheckid;
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        client.executeNonQuery('pdelete_lotCheck(?,?,?,?,?)', [id, line, lotCheckid ,loginId, orgId],
+        client.executeNonQuery('pdelete_lotCheck(?,?,?,?,?)', [id, line, lotCheckid, loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -964,7 +966,7 @@ router.delete('/orderDelete', (req, res, next) => {
         var orderid = req.query.orderid;
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        client.executeNonQuery('pdelete_order(?,?,?,?,?)', [id, line, orderid ,loginId, orgId],
+        client.executeNonQuery('pdelete_order(?,?,?,?,?)', [id, line, orderid, loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -994,7 +996,7 @@ router.delete('/ReceiptDelete', (req, res, next) => {
         var ReceiptId = req.query.ReceiptId;
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        client.executeNonQuery('pdelete_Receipt(?,?,?,?,?)', [id, line, ReceiptId ,loginId, orgId],
+        client.executeNonQuery('pdelete_Receipt(?,?,?,?,?)', [id, line, ReceiptId, loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -1023,7 +1025,7 @@ router.delete('/YarnQCDelete', (req, res, next) => {
         var YarnQCid = req.query.YarnQCid;
         var loginId = req.decoded.loginId;
         var orgId = req.decoded.orgId;
-        client.executeNonQuery('pdelete_YarnQC(?,?,?,?,?)', [id, line, YarnQCid ,loginId, orgId],
+        client.executeNonQuery('pdelete_YarnQC(?,?,?,?,?)', [id, line, YarnQCid, loginId, orgId],
             req, res, next, function (result) {
                 try {
                     rows = result;
@@ -1044,269 +1046,396 @@ router.delete('/YarnQCDelete', (req, res, next) => {
     }
 });
 
-
-
 router.get('/LC-Outstanding', (req, res, next) => {
-    try {
+  try {
+    const orgId = req.decoded.orgId;
+    const lcno = req.query.lcno || '';
+    const status = req.query.status || '';
+    const buyer = req.query.buyer || '';
 
-        var orgId = req.decoded.orgId;
-        var lcno = req.query.lcno? req.query.lcno : ''
-        var status = req.query.status? req.query.status : ''
-        var buyer = req.query.buyer? req.query.buyer : ''
-        Query = `select 
-	spinner, 
-	lcNo, 
-	lcDate, 
-	pi, 
-	piDate,
-	yarnType, 
-	lcYarnKgs, 
-	yarnRate, 
-	yarnValue, 
-	allocatedYarnKgs, 
-	ROUND(unallocatedYarnKgs,2) AS unallocatedYarnKgs, 
-	ROUND(receiptYarnKgs,2) AS receiptYarnKgs, 
-	ROUND(PendingallocatedKgs,2) AS PendingallocatedKgs, 
-	ROUND(PendingReceiptKgs,2) AS PendingReceiptKgs, 
-	ROUND(Receiptvalue,2) AS Receiptvalue, 
-	Status ,
-	ROUND((yarnValue - Receiptvalue ),2) as PendingLCValue 
-from (
-	select 
-		spinner, 
-		lcNo, 
-		lcDate, 
-		pi, 
-		piDate, 
-		yarnType, 
-		lcYarnKgs, 
-		yarnRate,
-		yarnValue,
-		allocatedYarnKgs,
-		unallocatedYarnKgs,
-		receiptYarnKgs ,
-		(lcYarnKgs - allocatedYarnKgs) as PendingallocatedKgs,
-		( lcYarnKgs - receiptYarnKgs ) as PendingReceiptKgs ,
-		(yarnRate * receiptYarnKgs ) as Receiptvalue , 
-		Status 
-	from (	SELECT 
-			y.spinner AS spinner,
-			y.lcNo AS lcNo,
-			DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
-			y.pi AS pi,
-			DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
-			yll.yarnType AS yarnType,
-			yll.lcYarnKgs AS lcYarnKgs,
-			yll.yarnRate AS yarnRate,
-			yll.yarnValue AS yarnValue,
-			ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
-			ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
-			ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
-			yarnStatus AS Status
-		FROM yarn y
-		LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
-		LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
-		LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
-		WHERE y.orgId = 1
-		  AND y.status = 1 
-		  AND y.delStatus = 0 
-		  AND yll.orgId = 1
-		  AND yll.status = 1 
-		  AND yll.delStatus = 0
-		  AND YRL.orgId = 1
-		  AND YRL.status = 1 
-		  AND YRL.delStatus = 0
-		GROUP BY
-			spinner,
-			lcNo,
-			lcDate,
-			pi,
-			piDate,
-			yarnType,
-			lcYarnKgs,
-			yarnRate,
-			yarnValue,
-			Status
-	) as Yarn  ) as Yarn `
-
-            if (lcno != '') {
-                Query += ` where lcNo = '${lcno}' `;
-            }
-    
-            if (status != '') {
-                Query += ` where Status = '${status}' `;
-            }
-
-            if (buyer != '') {
-                Query += ` where spinner = '${buyer}' `;
-            }
-
-            // if (buyer != '') {
-            //     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
-            // }
-    
-    
-
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, async function (result) {
-                try {
-                    rows = result;
-                    
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', workorder: [] });
-                    }
-                    else {
-                        res.send({
-                            success: true,
-                            LCOutstanding: rows.RowDataPacket[0],
-                        })
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
-            });
-    }
-    catch (err) {
-        next(err)
-    }
-});
-
-router.get('/LCOutstandingTotal', (req, res, next) => {
-    try {
-
-        var orgId = req.decoded.orgId;
-        var lcno = req.query.lcno? req.query.lcno : ''
-        var status = req.query.status? req.query.status : ''
-        var buyer = req.query.buyer? req.query.buyer : ''
-
-        Query = `SELECT
-    ROUND(SUM(Receiptvalue),2) AS Receiptvalue,
-    ROUND(SUM(PendingLCValue),2) AS PendingLCValue,
-    ROUND(SUM(PendingReceiptKgs),2) AS PendingReceiptKgs,
-    ROUND(SUM(receiptYarnKgs),2) AS ReceiptKgs
-FROM (
-    SELECT
-        spinner,
-        lcNo,
-        lcDate,
-        pi,
+    let baseQuery = `
+      SELECT 
+        spinner, 
+        lcNo, 
+        lcDate, 
+        pi, 
         piDate,
-        yarnType,
-        lcYarnKgs,
-        yarnRate,
-        yarnValue,
-        allocatedYarnKgs,
-        unallocatedYarnKgs,
-        receiptYarnKgs,
-        PendingallocatedKgs,
-        PendingReceiptKgs,
-        Receiptvalue,
+        yarnType, 
+        lcYarnKgs, 
+        yarnRate, 
+        yarnValue, 
+        allocatedYarnKgs, 
+        ROUND(unallocatedYarnKgs,2) AS unallocatedYarnKgs, 
+        ROUND(receiptYarnKgs,2) AS receiptYarnKgs, 
+        ROUND((lcYarnKgs - allocatedYarnKgs),2) AS PendingallocatedKgs,
+        ROUND((lcYarnKgs - receiptYarnKgs),2) AS PendingReceiptKgs,
+        ROUND((yarnRate * receiptYarnKgs),2) AS Receiptvalue,
         Status,
-        (yarnValue - Receiptvalue) AS PendingLCValue
-    FROM (
-        SELECT
-            spinner,
-            lcNo,
-            lcDate,
-            pi,
-            piDate,
-            yarnType,
-            lcYarnKgs,
-            yarnRate,
-            yarnValue,
-            allocatedYarnKgs,
-            unallocatedYarnKgs,
-            receiptYarnKgs,
-            (lcYarnKgs - allocatedYarnKgs) AS PendingallocatedKgs,
-            (lcYarnKgs - receiptYarnKgs) AS PendingReceiptKgs,
-            (yarnRate * receiptYarnKgs) AS Receiptvalue,
-            Status
-        FROM (
-            SELECT 
-                y.spinner AS spinner,
-                y.lcNo AS lcNo,
-                DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
-                y.pi AS pi,
-                DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
-                yll.yarnType AS yarnType,
-                yll.lcYarnKgs AS lcYarnKgs,
-                yll.yarnRate AS yarnRate,
-                yll.yarnValue AS yarnValue,
-                ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
-                ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
-                ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
-                y.yarnStatus AS Status
-            FROM yarn y
-            LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
-            LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
-            LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
-            WHERE y.orgId = 1
-              AND y.status = 1 
-              AND y.delStatus = 0 
-              AND yll.orgId = 1
-              AND yll.status = 1 
-              AND yll.delStatus = 0
-              AND YRL.orgId = 1
-              AND YRL.status = 1 
-              AND YRL.delStatus = 0
-            GROUP BY
-                spinner,
-                lcNo,
-                lcDate,
-                pi,
-                piDate,
-                yarnType,
-                lcYarnKgs,
-                yarnRate,
-                yarnValue,
-                Status
-        ) AS Yarn1
-    ) AS Yarn2
-) AS Yarn3
- `
+        ROUND((yarnValue - (yarnRate * receiptYarnKgs)),2) AS PendingLCValue
+      FROM (
+        SELECT 
+          y.spinner,
+          y.lcNo,
+          DATE_FORMAT(y.lcDate,'%Y-%m-%d') AS lcDate,
+          y.pi,
+          DATE_FORMAT(y.piDate,'%Y-%m-%d') AS piDate,
+          yll.yarnType,
+          yll.lcYarnKgs,
+          yll.yarnRate,
+          yll.yarnValue,
+          ROUND(SUM(YOA.allocatedYarnKgs),2) AS allocatedYarnKgs,
+          ROUND(SUM(YOA.unallocatedYarnKgs),2) AS unallocatedYarnKgs,
+          ROUND(SUM(YRL.receiptYarnKgs),2) AS receiptYarnKgs,
+          y.yarnStatus AS Status
+        FROM yarn y
+        LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
+        LEFT JOIN yarn_order_allocations YOA 
+               ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
+        LEFT JOIN yarn_receipts_lines YRL 
+               ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
+        WHERE y.orgId = ${orgId}
+          AND y.status = 1 AND y.delStatus = 0
+          AND yll.orgId = ${orgId}
+          AND yll.status = 1 AND yll.delStatus = 0
+          AND YRL.orgId = ${orgId}
+          AND YRL.status = 1 AND YRL.delStatus = 0
+        GROUP BY
+          spinner, lcNo, lcDate, pi, piDate,
+          yarnType, lcYarnKgs, yarnRate, yarnValue, Status
+      ) AS Yarn
+    `;
 
-if (lcno != '') {
-    Query += ` where lcNo = '${lcno}' `;
-}
+    const conditions = [];
 
-if (status != '') {
-    Query += ` where Status = '${status}' `;
-}
+    if (lcno) conditions.push(`lcNo = '${lcno}'`);
+    if (status) conditions.push(`Status = '${status}'`);
+    if (buyer) conditions.push(`spinner = '${buyer}'`);
 
-if (buyer != '') {
-    Query += ` where spinner = '${buyer}' `;
-}
+    if (conditions.length) {
+      baseQuery += ` WHERE ` + conditions.join(' AND ');
+    }
 
-// if (buyer != '') {
-//     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
-// }
-    
+    const finalQuery = `
+      SELECT 
+        *, 
+        SUM(Receiptvalue) OVER() AS TotalReceiptvalue,
+        SUM(PendingLCValue) OVER() AS TotalPendingLCValue,
+        SUM(PendingReceiptKgs) OVER() AS TotalPendingReceiptKgs,
+        SUM(receiptYarnKgs) OVER() AS TotalReceiptKgs
+      FROM (${baseQuery}) t
+    `;
 
-        client.executeStoredProcedure('pquery_execution(?)', [Query],
-            req, res, next, async function (result) {
-                try {
-                    rows = result;
-                    
-                    if (!rows.RowDataPacket) {
-                        res.json({ success: false, message: 'no records found!', LCOutstandingTotal: [] });
-                    }
-                    else {
-                        res.send({
-                            success: true,
-                            LCOutstandingTotal: rows.RowDataPacket[0],
-                        })
-                    }
-                }
-                catch (err) {
-                    next(err)
-                }
+    client.executeStoredProcedure(
+      'pquery_execution(?)',
+      [finalQuery],
+      req,
+      res,
+      next,
+      async (result) => {
+        try {
+          const rows = result?.RowDataPacket?.[0] || [];
+
+          if (!rows.length) {
+            return res.json({
+              success: false,
+              message: 'No records found',
+              LCOutstanding: [],
+              LCOutstandingTotal: {}
             });
-    }
-    catch (err) {
-        next(err)
-    }
+          }
+
+          const totals = {
+            Receiptvalue: rows[0].TotalReceiptvalue,
+            PendingLCValue: rows[0].TotalPendingLCValue,
+            PendingReceiptKgs: rows[0].TotalPendingReceiptKgs,
+            ReceiptKgs: rows[0].TotalReceiptKgs
+          };
+
+          // Remove total columns from row list
+          rows.forEach(r => {
+            delete r.TotalReceiptvalue;
+            delete r.TotalPendingLCValue;
+            delete r.TotalPendingReceiptKgs;
+            delete r.TotalReceiptKgs;
+          });
+
+          res.send({
+            success: true,
+            LCOutstanding: rows,
+            LCOutstandingTotal: totals
+          });
+        } catch (err) {
+          next(err);
+        }
+      }
+    );
+  } catch (err) {
+    next(err);
+  }
 });
+
+
+// router.get('/LC-Outstanding', (req, res, next) => {
+//     try {
+
+//         var orgId = req.decoded.orgId;
+//         var lcno = req.query.lcno ? req.query.lcno : ''
+//         var status = req.query.status ? req.query.status : ''
+//         var buyer = req.query.buyer ? req.query.buyer : ''
+//         Query = `select 
+// 	spinner, 
+// 	lcNo, 
+// 	lcDate, 
+// 	pi, 
+// 	piDate,
+// 	yarnType, 
+// 	lcYarnKgs, 
+// 	yarnRate, 
+// 	yarnValue, 
+// 	allocatedYarnKgs, 
+// 	ROUND(unallocatedYarnKgs,2) AS unallocatedYarnKgs, 
+// 	ROUND(receiptYarnKgs,2) AS receiptYarnKgs, 
+// 	ROUND(PendingallocatedKgs,2) AS PendingallocatedKgs, 
+// 	ROUND(PendingReceiptKgs,2) AS PendingReceiptKgs, 
+// 	ROUND(Receiptvalue,2) AS Receiptvalue, 
+// 	Status ,
+// 	ROUND((yarnValue - Receiptvalue ),2) as PendingLCValue 
+// from (
+// 	select 
+// 		spinner, 
+// 		lcNo, 
+// 		lcDate, 
+// 		pi, 
+// 		piDate, 
+// 		yarnType, 
+// 		lcYarnKgs, 
+// 		yarnRate,
+// 		yarnValue,
+// 		allocatedYarnKgs,
+// 		unallocatedYarnKgs,
+// 		receiptYarnKgs ,
+// 		(lcYarnKgs - allocatedYarnKgs) as PendingallocatedKgs,
+// 		( lcYarnKgs - receiptYarnKgs ) as PendingReceiptKgs ,
+// 		(yarnRate * receiptYarnKgs ) as Receiptvalue , 
+// 		Status 
+// 	from (	SELECT 
+// 			y.spinner AS spinner,
+// 			y.lcNo AS lcNo,
+// 			DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
+// 			y.pi AS pi,
+// 			DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
+// 			yll.yarnType AS yarnType,
+// 			yll.lcYarnKgs AS lcYarnKgs,
+// 			yll.yarnRate AS yarnRate,
+// 			yll.yarnValue AS yarnValue,
+// 			ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
+// 			ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
+// 			ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
+// 			yarnStatus AS Status
+// 		FROM yarn y
+// 		LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
+// 		LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
+// 		LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
+// 		WHERE y.orgId = 1
+// 		  AND y.status = 1 
+// 		  AND y.delStatus = 0 
+// 		  AND yll.orgId = 1
+// 		  AND yll.status = 1 
+// 		  AND yll.delStatus = 0
+// 		  AND YRL.orgId = 1
+// 		  AND YRL.status = 1 
+// 		  AND YRL.delStatus = 0
+// 		GROUP BY
+// 			spinner,
+// 			lcNo,
+// 			lcDate,
+// 			pi,
+// 			piDate,
+// 			yarnType,
+// 			lcYarnKgs,
+// 			yarnRate,
+// 			yarnValue,
+// 			Status
+// 	) as Yarn  ) as Yarn `
+
+//         if (lcno != '') {
+//             Query += ` where lcNo = '${lcno}' `;
+//         }
+
+//         if (status != '') {
+//             Query += ` where Status = '${status}' `;
+//         }
+
+//         if (buyer != '') {
+//             Query += ` where spinner = '${buyer}' `;
+//         }
+
+//         // if (buyer != '') {
+//         //     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
+//         // }
+
+
+
+//         client.executeStoredProcedure('pquery_execution(?)', [Query],
+//             req, res, next, async function (result) {
+//                 try {
+//                     rows = result;
+
+//                     if (!rows.RowDataPacket) {
+//                         res.json({ success: false, message: 'no records found!', workorder: [] });
+//                     }
+//                     else {
+//                         res.send({
+//                             success: true,
+//                             LCOutstanding: rows.RowDataPacket[0],
+//                         })
+//                     }
+//                 }
+//                 catch (err) {
+//                     next(err)
+//                 }
+//             });
+//     }
+//     catch (err) {
+//         next(err)
+//     }
+// });
+
+// router.get('/LCOutstandingTotal', (req, res, next) => {
+//     try {
+
+//         var orgId = req.decoded.orgId;
+//         var lcno = req.query.lcno ? req.query.lcno : ''
+//         var status = req.query.status ? req.query.status : ''
+//         var buyer = req.query.buyer ? req.query.buyer : ''
+
+//         Query = `SELECT
+//     ROUND(SUM(Receiptvalue),2) AS Receiptvalue,
+//     ROUND(SUM(PendingLCValue),2) AS PendingLCValue,
+//     ROUND(SUM(PendingReceiptKgs),2) AS PendingReceiptKgs,
+//     ROUND(SUM(receiptYarnKgs),2) AS ReceiptKgs
+// FROM (
+//     SELECT
+//         spinner,
+//         lcNo,
+//         lcDate,
+//         pi,
+//         piDate,
+//         yarnType,
+//         lcYarnKgs,
+//         yarnRate,
+//         yarnValue,
+//         allocatedYarnKgs,
+//         unallocatedYarnKgs,
+//         receiptYarnKgs,
+//         PendingallocatedKgs,
+//         PendingReceiptKgs,
+//         Receiptvalue,
+//         Status,
+//         (yarnValue - Receiptvalue) AS PendingLCValue
+//     FROM (
+//         SELECT
+//             spinner,
+//             lcNo,
+//             lcDate,
+//             pi,
+//             piDate,
+//             yarnType,
+//             lcYarnKgs,
+//             yarnRate,
+//             yarnValue,
+//             allocatedYarnKgs,
+//             unallocatedYarnKgs,
+//             receiptYarnKgs,
+//             (lcYarnKgs - allocatedYarnKgs) AS PendingallocatedKgs,
+//             (lcYarnKgs - receiptYarnKgs) AS PendingReceiptKgs,
+//             (yarnRate * receiptYarnKgs) AS Receiptvalue,
+//             Status
+//         FROM (
+//             SELECT 
+//                 y.spinner AS spinner,
+//                 y.lcNo AS lcNo,
+//                 DATE_FORMAT(y.lcDate, "%Y-%m-%d") AS lcDate,
+//                 y.pi AS pi,
+//                 DATE_FORMAT(y.piDate, "%Y-%m-%d") AS piDate,
+//                 yll.yarnType AS yarnType,
+//                 yll.lcYarnKgs AS lcYarnKgs,
+//                 yll.yarnRate AS yarnRate,
+//                 yll.yarnValue AS yarnValue,
+//                 ROUND(SUM(YOA.allocatedYarnKgs), 2) AS allocatedYarnKgs,
+//                 ROUND(SUM(YOA.unallocatedYarnKgs), 2) AS unallocatedYarnKgs,
+//                 ROUND(SUM(YRL.receiptYarnKgs), 2) AS receiptYarnKgs,
+//                 y.yarnStatus AS Status
+//             FROM yarn y
+//             LEFT JOIN yarn_lc_lines yll ON y.id = yll.yarnId
+//             LEFT JOIN yarn_order_allocations YOA ON yll.id = YOA.yarnLineId AND y.id = YOA.yarnId
+//             LEFT JOIN yarn_receipts_lines YRL ON YOA.id = YRL.yarnOrderId AND y.id = YRL.yarnId
+//             WHERE y.orgId = 1
+//               AND y.status = 1 
+//               AND y.delStatus = 0 
+//               AND yll.orgId = 1
+//               AND yll.status = 1 
+//               AND yll.delStatus = 0
+//               AND YRL.orgId = 1
+//               AND YRL.status = 1 
+//               AND YRL.delStatus = 0
+//             GROUP BY
+//                 spinner,
+//                 lcNo,
+//                 lcDate,
+//                 pi,
+//                 piDate,
+//                 yarnType,
+//                 lcYarnKgs,
+//                 yarnRate,
+//                 yarnValue,
+//                 Status
+//         ) AS Yarn1
+//     ) AS Yarn2
+// ) AS Yarn3
+//  `
+
+//         if (lcno != '') {
+//             Query += ` where lcNo = '${lcno}' `;
+//         }
+
+//         if (status != '') {
+//             Query += ` where Status = '${status}' `;
+//         }
+
+//         if (buyer != '') {
+//             Query += ` where spinner = '${buyer}' `;
+//         }
+
+//         // if (buyer != '') {
+//         //     Query += ` WHERE JSON_CONTAINS(buyers, JSON_OBJECT('Buyer','${buyer}')); `;
+//         // }
+
+
+//         client.executeStoredProcedure('pquery_execution(?)', [Query],
+//             req, res, next, async function (result) {
+//                 try {
+//                     rows = result;
+
+//                     if (!rows.RowDataPacket) {
+//                         res.json({ success: false, message: 'no records found!', LCOutstandingTotal: [] });
+//                     }
+//                     else {
+//                         res.send({
+//                             success: true,
+//                             LCOutstandingTotal: rows.RowDataPacket[0],
+//                         })
+//                     }
+//                 }
+//                 catch (err) {
+//                     next(err)
+//                 }
+//             });
+//     }
+//     catch (err) {
+//         next(err)
+//     }
+// });
 
 
 router.get('/Buyer-List', (req, res, next) => {
